@@ -29,3 +29,9 @@ el resultado. Estos vectores son un conjunto de ejemplo para su propia
 comprobación; **no sustituyen** los al menos 3 casos de prueba por
 instrucción (36 en total) que la especificación pide construir y validar
 usted mismo contra el toolchain oficial (`objdump -d`).
+
+
+
+#Desarrollo de la Documentación 
+![alt text](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-08-31%20083831.png)
+
