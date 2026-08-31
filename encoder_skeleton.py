@@ -31,7 +31,21 @@ def encode_instruction(instruction: str) -> int:
     # TODO: implementar. Sugerencia: parsear el mnemónico y los operandos,
     # despachar según el formato (R/I/S/B), y ensamblar los campos con
     # operaciones de bits.
-    raise NotImplementedError("encode_instruction: pendiente de implementar")
+
+    splitInstruction = instruction.split(" ")
+    mnemonic = splitInstruction[0]
+    registers = [reg.strip(",") for reg in splitInstruction[1:]]
+
+    print("the mnemonic:")
+    print(mnemonic)
+    print("the registers:")
+    print(registers)
+
+    cod_32bits = 0  
+
+    return cod_32bits
+
+    #raise NotImplementedError("encode_instruction: pendiente de implementar para la instrucción")
 
 
 def explain_instruction(instruction: str, word: int) -> str:
@@ -44,7 +58,28 @@ def explain_instruction(instruction: str, word: int) -> str:
     criterio, siempre que sea claro.
     """
     # TODO: implementar.
-    raise NotImplementedError("explain_instruction: pendiente de implementar")
+    #raise NotImplementedError("explain_instruction: pendiente de implementar")
+
+    print("the instruction:")
+    print(instruction)
+    print("the word:")
+    print(f"{word:032b}")  # Print the word in binary format    
+
+    if instruction.startswith("add") or instruction.startswith("sub") or instruction.startswith("and") or instruction.startswith("or"):
+        format_type = "R"
+    elif instruction.startswith("addi") or instruction.startswith("andi"):
+        format_type = "I"
+    elif instruction.startswith("lw") or instruction.startswith("lb") or instruction.startswith("sw") or instruction.startswith("sb"):
+        format_type = "I"  # Load/store instructions use I
+    elif instruction.startswith("beq") or instruction.startswith("bne"):
+        format_type = "B"
+    else:
+        format_type = "Unknown" 
+
+    print(f"Format type: {format_type}")
+
+    textPrint = f"Instruction: {instruction}\n"
+    return textPrint
 
 
 def main():
