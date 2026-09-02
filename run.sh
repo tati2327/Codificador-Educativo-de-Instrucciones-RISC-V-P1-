@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 # Punto de entrada fijo requerido por la especificación.
 # Uso: ./run.sh "<instruccion>"

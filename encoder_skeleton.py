@@ -33,15 +33,34 @@ def encode_instruction(instruction: str) -> int:
     # operaciones de bits.
 
     opcode = funct3 = funct7 = rs1 = rs2 = rd = cod_32bits = " "
+    out_word = 0  # Initialize out_word to 0
 
     splitInstruction = instruction.split(" ")
     mnemonic = splitInstruction[0]
     registers = [reg.strip(",") for reg in splitInstruction[1:]]
+    print("the mnemonic:")
+    print(mnemonic)
+    print("the registers:")
+    print(registers)
+
+    #Convertir los registros a binario
+    rd = format(int(registers[0][1:]), '05b')
+    #rs1 = format(int(registers[1][1:]), '05b')
+    #rs2 = format(int(registers[2][1:]), '05b')
+    print(f"rd Value: {rd}")
+    #print(f"rs1 Value: {rs1}")
+    #print(f"rs2 Value: {rs2}") 
 
     #Validar las instrucciones de Tipo R y convertir a binario en un formato de 32 bits
     if mnemonic == "add" or mnemonic == "sub" or mnemonic == "and" or mnemonic == "or":
         format_type = "R"
         opcode = "0110011"
+
+        rs1 = format(int(registers[1][1:]), '05b')
+        print(f"rs1 Value: {rs1}")
+
+        rs2 = format(int(registers[2][1:]), '05b')
+        print(f"rs2 Value: {rs2}") 
 
         #Seleccionar el funct7  de cada instrucción
         if mnemonic == "sub":
@@ -59,50 +78,47 @@ def encode_instruction(instruction: str) -> int:
             funct3 = "110"
         print(f"funct3 Value: {funct3}")
 
-        #Convertir los registros a binario
-        rd = format(int(registers[0][1:]), '05b')
-        rs1 = format(int(registers[1][1:]), '05b')
-        rs2 = format(int(registers[2][1:]), '05b')
-        print(f"rd Value: {rd}")
-        print(f"rs1 Value: {rs1}")
-        print(f"rs2 Value: {rs2}")  
-
         #Combinar los campos en un solo valor de 32 bits
-        cod_32bits = int(f"{funct7}{rs2}{rs1}{funct3}{rd}{opcode}", 2)
-        print(f"32-bit encoding: {cod_32bits:032b}")  
+        cod_32bits = f"{funct7}{rs2}{rs1}{funct3}{rd}{opcode}"
 
     #Validar las instrucciones de Tipo I y convertir a binario en un formato de 32 bits
     elif mnemonic == "addi" or mnemonic == "andi" or mnemonic == "lw" or mnemonic == "lb":
         format_type = "I"
+        inm = 0  # Initialize immediate value
 
         #Seleccionar el opcode de cada instrucción
         if mnemonic == "addi" or mnemonic == "andi":
             opcode = "0010011"
+            #Seleccionar el inmediate value de la instrucción
+            imm = format(int(registers[2]), '012b')  # Immediate value is 12 bits
+            rs1 = format(int(registers[1][1:]), '05b')
         elif mnemonic == "lw" or mnemonic == "lb":
             opcode = "0000011"
+            #Seleccionar el inmediate value de la instrucción
+            inm, rs1 = registers[1].split('(')
+            rs1 = rs1.rstrip(')')
+            rs1 = format(int(rs1[1:]), '05b')  # Update rs1 based on the register in parentheses
 
-        print(f"opcode Value: {opcode}")
+            if inm.startswith('-'):
+                imm = format(int(inm) & 0xFFF, '012b')  # Handle negative immediate values
+            else:           
+                imm = format(int(inm), '012b')  # Immediate value is 12 bits    
+        print(f"rs1 Value: {rs1}")
+        print(f"Immediate Value: {imm}")
 
         #Seleccionar el funct3 de cada instrucción
-        if mnemonic == "addi" or mnemonic == "lb":
+        if mnemonic == "addi":
             funct3 = "000"
         elif mnemonic == "andi":
             funct3 = "111"
+        elif mnemonic == "lb":
+            funct3 = "000"
         elif mnemonic == "lw":
             funct3 = "010"
         print(f"funct3 Value: {funct3}")
 
-        #Convertir los registros a binario
-        rd = format(int(registers[0][1:]), '05b')
-        rs1 = format(int(registers[1][1:]), '05b')
-        imm = format(int(registers[2]), '012b')  # Immediate value is 12 bits
-        print(f"rd Value: {rd}")
-        print(f"rs1 Value: {rs1}")
-        print(f"Immediate Value: {imm}")
-
         #Combinar los campos en un solo valor de 32 bits
-        cod_32bits = int(f"{imm}{rs1}{funct3}{rd}{opcode}", 2)
-        print(f"32-bit encoding: {cod_32bits:032b}") 
+        cod_32bits = f"{imm}{rs1}{funct3}{rd}{opcode}"
 
     #Validar las instrucciones de Tipo S y convertir a binario en un formato de 32 bits
     elif mnemonic == "sw" or mnemonic == "sb":
@@ -117,13 +133,16 @@ def encode_instruction(instruction: str) -> int:
         format_type = "Unknown" 
 
     print(f"Format type: {format_type}")
+    print(f"opcode Value: {opcode}")
 
-    print("the mnemonic:")
-    print(mnemonic)
-    print("the registers:")
-    print(registers)
+    print (f"the cod_32bits binary:")
+    print(cod_32bits)
 
-    return cod_32bits
+    print(f"the cod_32bits as integer:")    
+    out_word = int(cod_32bits, 2)
+    print(out_word)
+
+    return out_word  # Return the encoded instruction as an integer
 
     #raise NotImplementedError("encode_instruction: pendiente de implementar para la instrucción")
 
@@ -142,13 +161,16 @@ def explain_instruction(instruction: str, word: int) -> str:
 
     print("the instruction:")
     print(instruction)
-    print("the word:")
-    print(f"{word:032b}")  # Print the word in binary format    
+    print("the word integer:")  
+    print(word) 
+    print("the word binary:")
+    word = format(word, '032b')  # Convert the integer to a 32-bit binary string
+    print(word)
 
-    textPrint = f"Instruction: {word}\n"
+    textPrint = "Colocar aqui la palabra de entero a binario de 32 bits y explicar los campos de la instrucción"
     return textPrint
 
-
+ 
 def main():
     if len(sys.argv) != 2:
         print(f'Uso: {sys.argv[0]} "<instruccion>"', file=sys.stderr)
@@ -158,9 +180,9 @@ def main():
     instruction = sys.argv[1]
     word = encode_instruction(instruction) & 0xFFFFFFFF
 
-    print("the instruction:")
+    print("the instruction:  (main)")
     print(instruction)
-    print("the word:")
+    print("the word:         (main)")
     print(f"{word:032b}")  # Print the word in binary format
 
     print(explain_instruction(instruction, word))
