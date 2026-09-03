@@ -31,10 +31,10 @@ main:
 	sb x18, 1701(x20) 
 	sb x6, 72(x28) 
 	sb x28, 1439(x11) 
-	beq x30, x4, -80 
-	beq x31, x23, 16 
-	beq x26, x9, 60 
-	bne x5, x0, 60 
-	bne x12, x15, 16 
-	bne x17, x22, 20
+	beq x30, x4, .+-80 
+	beq x31, x23, .+16 
+	beq x26, x9, .+60 
+	bne x5, x0, .+60 
+	bne x12, x15, .+16 
+	bne x17, x22, .+20
 	

@@ -123,6 +123,38 @@ def encode_instruction(instruction: str) -> int:
     #Validar las instrucciones de Tipo S y convertir a binario en un formato de 32 bits
     elif mnemonic == "sw" or mnemonic == "sb":
         format_type = "S"  # Load/store instructions use I
+        inm = 0  # Initialize immediate value
+        opcode = "0100011"
+
+        #Seleccionar el funct3 de cada instrucción
+        if mnemonic == "sw":
+            funct3 = "010"
+        elif mnemonic == "sb":
+            funct3 = "000"
+
+        #Seleccionar el inmediate value de la instrucción
+        inm, rs1 = registers[1].split('(')
+        rs1 = rs1.rstrip(')')
+        rs1 = format(int(rs1[1:]), '05b')  # Update rs1 based on the register in parentheses
+
+        # Convertir immediate a entero y obtener representación de 12 bits
+        inm = int(inm)
+        imm = format(inm & 0xFFF, '012b')
+
+        print(f"rs1 Value: {rs1}")
+        print(f"Immediate Value: {imm}")
+        print(f"funct3 Value: {funct3}")
+
+        # Separar immediate en los campos de una instrucción S
+        inm_high = imm[0:7]   # Bits 11:5
+        inm_low = imm[7:12]   # Bits 4:0
+
+        print(f"Immediate [11:5]: {inm_high}")
+        print(f"Immediate [4:0]: {inm_low}")
+
+        #Combinar los campos en un solo valor de 32 bits
+        cod_32bits = f"{inm_high}{rd}{rs1}{funct3}{inm_low}{opcode}"
+        print(f"the cod_32bits binary (S): {cod_32bits}")
 
     #Validar las instrucciones de Tipo B y convertir a binario en un formato de 32 bits
     elif mnemonic == "beq" or mnemonic == "bne":
