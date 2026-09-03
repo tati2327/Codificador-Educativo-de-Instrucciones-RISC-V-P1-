@@ -13,6 +13,8 @@ propia herramienta desde cero, en el lenguaje que prefiera, siempre que
 respete el mismo contrato (ver especificación, sección "Modo de operación").
 """
 import sys
+import tkinter as tk
+
 
 SOPORTADAS = ["add", "sub", "and", "or", "addi", "andi",
               "lw", "lb", "sw", "sb", "beq", "bne"]
@@ -159,6 +161,48 @@ def encode_instruction(instruction: str) -> int:
     #Validar las instrucciones de Tipo B y convertir a binario en un formato de 32 bits
     elif mnemonic == "beq" or mnemonic == "bne":
         format_type = "B"
+        opcode = "1100011"
+        
+        rs1 = format(int(registers[0][1:]), '05b')
+        print(f"rs1 Value: {rs1}")
+
+        rs2 = format(int(registers[1][1:]), '05b')
+        print(f"rs2 Value: {rs2}") 
+
+        #Seleccionar el funct3 de cada instrucción
+        if mnemonic == "beq":
+            funct3 = "000"
+        elif mnemonic == "bne":
+            funct3 = "001"
+        print(f"funct3 Value: {funct3}")
+
+        # Convertir immediate a entero y obtener representación de 12 bits
+        inm = int(registers[2])
+        imm = format(inm & 0xFFF, '012b')
+
+        #Seleccionar el inmediate value de la instrucción
+        #imm = format(int(registers[2]), '012b')
+        print(f"inmediate Value: {inm}") 
+
+        # Convertir immediate a entero y obtener representación de 12 bits
+        inm = int(inm)
+        imm = format(inm & 0xFFF, '012b')
+
+        print(f"Immediate Value: {imm}")
+
+        # Separar immediate en los campos de una instrucción S
+        inm_high = imm[0:7]   # Bits 11:5
+        inm_low = imm[7:12]   # Bits 4:0
+
+        print(f"Immediate [11:5]: {inm_high}")
+        print(f"Immediate [4:0]: {inm_low}")
+
+        #Combinar los campos en un solo valor de 32 bits
+        cod_32bits = f"{inm_high}{rd}{rs1}{funct3}{inm_low}{opcode}"
+        print(f"the cod_32bits binary (S): {cod_32bits}")
+
+        #Combinar los campos en un solo valor de 32 bits
+        cod_32bits = f"{inm_high}{rs2}{rs1}{funct3}{inm_low}{opcode}"
 
     #Validar las instrucciones de Tipo R y convertir a binario en un formato de 32 bits
     else:
@@ -198,6 +242,26 @@ def explain_instruction(instruction: str, word: int) -> str:
     print("the word binary:")
     word = format(word, '032b')  # Convert the integer to a 32-bit binary string
     print(word)
+
+        # Crear ventana
+    ventana = tk.Tk()
+
+    # Título
+    ventana.title("Codificador RISC-V")
+
+    # Tamaño de la ventana
+    ventana.geometry("600x400")
+
+    # Texto
+    etiqueta = tk.Label(
+        ventana,
+        text="Codificador de instrucciones RISC-V",
+        font=("Arial", 20)
+    )
+    etiqueta.pack(pady=30)
+
+    # Mantener la ventana abierta
+    ventana.mainloop()
 
     textPrint = "Colocar aqui la palabra de entero a binario de 32 bits y explicar los campos de la instrucción"
     return textPrint
