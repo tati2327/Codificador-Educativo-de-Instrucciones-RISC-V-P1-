@@ -1,42 +1,44 @@
-# Kit del proyecto
+# Codificador Educativo de Instrucciones RISC-V
 
-- `encoder_skeleton.py`: esqueleto en Python con el contrato de entrada/salida
-  ya implementado. Complete `encode_instruction` y `explain_instruction`.
-  Su uso es opcional; puede implementar la herramienta en otro lenguaje o
-  desde cero, siempre que respete el mismo contrato (ver especificación).
-- `run.sh`: punto de entrada fijo y obligatorio (`./run.sh "<instruccion>"`).
-  Tal como se entrega, invoca `encoder_skeleton.py`. Si cambia de lenguaje o
-  de estructura, ajuste este archivo para que siga invocando su solución de
-  la misma forma.
-- `vectores_ejemplo.txt`: instrucciones de ejemplo junto con su codificación
-  correcta, para que pueda comprobar su herramienta desde el primer día.
+Proyecto para la codificación y análisis de instrucciones de la arquitectura **RISC-V RV32**.
 
-## Cómo usar `vectores_ejemplo.txt`
+El programa permite recibir instrucciones en lenguaje ensamblador y generar su representación en código máquina.
 
-El archivo tiene el formato `instruccion ; 0xHEX`, una por línea (las líneas
-que empiezan con `#` son comentarios). Por ejemplo:
+## Inicio rápido
 
-```
-add x7, x20, x6 ; 0x006a03b3
-```
+sudo apt update
+sudo apt install python3 python3-tk gcc-riscv64-unknown-elf git
 
-Esto significa: al ejecutar `./run.sh "add x7, x20, x6"`, la línea `HEX:`
-de su salida debe ser exactamente `HEX: 0x006a03b3`.
+git clone <URL_DEL_REPOSITORIO>
+cd Codificador-Educativo-de-Instrucciones-RISC-V-P1-
 
-Puede comparar manualmente, o escribir un script propio corto que lea el
-archivo línea por línea, ejecute `./run.sh` con cada instrucción, y compare
-el resultado. Estos vectores son un conjunto de ejemplo para su propia
-comprobación; **no sustituyen** los al menos 3 casos de prueba por
-instrucción (36 en total) que la especificación pide construir y validar
-usted mismo contra el toolchain oficial (`objdump -d`).
+chmod +x run.sh
 
+./run.sh "add x7, x20, x6"
 
+---
 
-#Desarrollo de la Documentación 
-![alt text](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-08-31%20083831.png)
+# Requisitos previos
 
-![alt text](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-08-31%20084415.png)
+Antes de ejecutar el proyecto es necesario instalar las siguientes herramientas:
 
-![alt text](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-08-31%20084426.png)
+- WSL con Ubuntu
+- Python 3
+- Tkinter
+- Toolchain de RISC-V
+- Ensamblador RISC-V
+- Objdump
+- Git
+
+---
+
+# 1. Instalación de WSL
+
+Este proyecto fue desarrollado utilizando **Windows Subsystem for Linux (WSL)** con Ubuntu.
+
+Abra PowerShell como administrador y ejecute:
+
+```powershell
+wsl --install
 
 
