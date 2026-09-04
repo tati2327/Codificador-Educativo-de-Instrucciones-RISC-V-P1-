@@ -220,17 +220,6 @@ def encode_instruction(instruction: str) -> int:
     return out_word  # Return the encoded instruction as an integer
 
 
-def create_canvas():
-    """
-    Crea un lienzo de Tkinter para mostrar la representación visual de los
-    campos de la instrucción.
-    """
-    root = tk.Tk()
-    root.title("Visualización de Instrucción RISC-V")
-    canvas = tk.Canvas(root, width=800, height=200)
-    canvas.pack()
-    return root, canvas
-
 def explain_instruction(instruction: str, word: int) -> str:
     """
     Debe retornar un texto (para imprimirse en pantalla) que muestre, de
@@ -317,12 +306,12 @@ def explain_instruction(instruction: str, word: int) -> str:
         canvas.create_text(x1 + 400, y1 + 270, text=instruction, font=("Times New Roman", 22, "italic"))
         canvas.create_text(x1 + 400, y1 + 310, text=f"0x{word:08x}", font=("Times New Roman", 20, "italic"))
 
-        canvas_text.create_text(x1 + 400, y1, text=f"opcode: Identifica la instrucción como operación tipo R", font=("Times New Roman", 12, "italic"),anchor="center")
-        canvas_text.create_text(x1 + 400, y1 + 45, text=f"rd: Registro destino {registers[0]}", font=("Times New Roman", 12, "italic"))
-        canvas_text.create_text(x1 + 400, y1 + 90, text="funct3: Determina el tipo de operación ", font=("Times New Roman", 12, "italic"))
-        canvas_text.create_text(x1 + 400, y1 + 135, text=f"rs1: Registro fuente {registers[1]}", font=("Times New Roman", 12, "italic"))
-        canvas_text.create_text(x1 + 400, y1 + 180, text=f"rs2: Registro fuente {registers[2]}", font=("Times New Roman", 12, "italic"))
-        canvas_text.create_text(x1 + 400, y1 + 225, text="funct7: Identifica la operación específica", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1, text=f"opcode: Identifica la instrucción como una operación de tipo R", font=("Times New Roman", 12, "italic"),anchor="center")
+        canvas_text.create_text(x1 + 400, y1 + 45, text=f"rd: Registro destino `{registers[0]}` donde se guarda el resultado", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 90, text=f"funct3: Determina el tipo de operación `{mnemonic}`", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 135, text=f"rs1:  Primer operando en el registro `{registers[1]}`", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 180, text=f"rs2:  Segundo operando en el registro `{registers[2]}`", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 225, text=f"funct7: Identifica la operación específica `{mnemonic}`", font=("Times New Roman", 12, "italic"))
 
         print(f"R-type instruction fields:")
         print(f"funct7: {funct7} (bits 31-25)")
@@ -338,6 +327,50 @@ def explain_instruction(instruction: str, word: int) -> str:
         rd = new_word[20:25]
         opcode = new_word[25:32]
 
+        inm_str = int(imm, 2)  # Convert binary string to integer
+        if inm_str >= 2**11:  # Si el bit de signo es 1
+            inm_str -= 2**12
+
+        #canvas.create_rectangle(30, 60, 798, 190, fill="lightblue")
+        x1, y1 = 30, 40
+        canvas.create_rectangle(x1, y1, x1+24.5*12, 190, fill="#76C3CF")
+        canvas.create_text((x1 + x1+24.5*12) / 2, y1 + 170, text=f"inm: {inm_str}", font=("Times New Roman", 10))
+        canvas.create_text((x1 + x1+24.5*12) / 2, y1 + 195, text=f"{imm}", font=("Times New Roman", 10))
+        canvas.create_text((x1 + x1+24.5*12) / 2, y1 + 220, text="(bits 31-20)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+24.5*12, y1, x1+25*17, 190, fill="#5252B7")
+        canvas.create_text((x1+24.5*12 + x1+25*17) / 2, y1 + 170, text=f"rs1: {int(rs1, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+24.5*12 + x1+25*17) / 2, y1 + 195, text=f"{rs1}", font=("Times New Roman", 10))
+        canvas.create_text((x1+24.5*12 + x1+25*17) / 2, y1 + 220, text="(bits 19-15)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*17, y1, x1+25*20, 190, fill="#36A6C5")
+        canvas.create_text((x1+25*17 + x1+25*20) / 2, y1 + 170, text=f"funct3: {int(funct3, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*17 + x1+25*20) / 2, y1 + 195, text=f"{funct3}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*17 + x1+25*20) / 2, y1 + 220, text="(bits 12-14)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*20, y1, x1+25*25, 190, fill="#8AB9E3")
+        canvas.create_text((x1+25*20 + x1+25*25) / 2, y1 + 170, text=f"rd: {int(rd, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*20 + x1+25*25) / 2, y1 + 195, text=f"{rd}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*20 + x1+25*25) / 2, y1 + 220, text="(bits 11-7)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*25, y1, x1+25*32, 190, fill="#5355E8")
+        canvas.create_text((x1+25*25 + x1+25*32) / 2, y1 + 170, text=f"opcode: {int(opcode, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*25 + x1+25*32) / 2, y1 + 195, text=f"{opcode}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*25 + x1+25*32) / 2, y1 + 220, text="(bits 6-0)", font=("Times New Roman", 10))
+
+        for i in range(1, 33):
+            x1_plus = 49*i+i
+            canvas.create_text((x1 + x1_plus) / 2, y1 + 65, text=f"{new_word[i-1]}", font=("Times New Roman", 15,"bold"),fill="white")
+
+        canvas.create_text(x1 + 400, y1 + 270, text=instruction, font=("Times New Roman", 22, "italic"))
+        canvas.create_text(x1 + 400, y1 + 310, text=f"0x{word:08x}", font=("Times New Roman", 20, "italic"))
+
+        canvas_text.create_text(x1 + 400, y1, text=f"opcode: Identifica la instrucción como una operación de tipo I.", font=("Times New Roman", 12, "italic"),anchor="center")
+        canvas_text.create_text(x1 + 400, y1 + 45, text=f"rd: Registro destino `{registers[0]}` donde se guarda el resultado.", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 90, text=f"funct3: Determina el tipo de operación `{mnemonic}`.", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 135, text=f"rs1: Primer operando en el registro `x{int(rs1, 2)}`", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 180, text=f"inm: Valor inmediato `{inm_str}` sirve para guardar un valor constante dentro de la propia instrucción.", font=("Times New Roman", 12, "italic"))
+
         print(f"I-type instruction fields:")
         print(f"imm: {imm} (bits 31-20)")
         print(f"rs1: {rs1} (bits 19-15)")
@@ -351,6 +384,58 @@ def explain_instruction(instruction: str, word: int) -> str:
         funct3 = new_word[17:20]
         imm_low = new_word[20:25]
         opcode = new_word[25:32]
+
+        imm = imm_high + imm_low
+        inm_str = int(imm, 2)  # Convert binary string to integer
+        if inm_str >= 2**11:  # Si el bit de signo es 1
+            inm_str -= 2**12
+
+        #canvas.create_rectangle(30, 60, 798, 190, fill="lightblue")
+        x1, y1 = 30, 40
+        canvas.create_rectangle(x1, y1, x1+24.5*7, 190, fill="#76C3CF")
+        canvas.create_text((x1 + x1+24.5*7) / 2, y1 + 170, text=f"inm [11:5]: {int(imm_high, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1 + x1+24.5*7) / 2, y1 + 195, text=f"{imm_high}", font=("Times New Roman", 10))
+        canvas.create_text((x1 + x1+24.5*7) / 2, y1 + 220, text="(bits 31-25)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+24.5*7, y1, x1+25*12, 190, fill="#5252B7")
+        canvas.create_text((x1+24.5*7 + x1+25*12) / 2, y1 + 170, text=f"rs2: {int(rs2, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+24.5*7 + x1+25*12) / 2, y1 + 195, text=f"{rs2}", font=("Times New Roman", 10))
+        canvas.create_text((x1+24.5*7 + x1+25*12) / 2, y1 + 220, text="(bits 19-15)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+24.5*12, y1, x1+25*17, 190, fill="#587BE2")
+        canvas.create_text((x1+24.5*12 + x1+25*17) / 2, y1 + 170, text=f"rs1: {int(rs1, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+24.5*12 + x1+25*17) / 2, y1 + 195, text=f"{rs1}", font=("Times New Roman", 10))
+        canvas.create_text((x1+24.5*12 + x1+25*17) / 2, y1 + 220, text="(bits 19-15)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*17, y1, x1+25*20, 190, fill="#36A6C5")
+        canvas.create_text((x1+25*17 + x1+25*20) / 2, y1 + 170, text=f"funct3: {int(funct3, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*17 + x1+25*20) / 2, y1 + 195, text=f"{funct3}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*17 + x1+25*20) / 2, y1 + 220, text="(bits 12-14)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*20, y1, x1+25*25, 190, fill="#8AB9E3")
+        canvas.create_text((x1+25*20 + x1+25*25) / 2, y1 + 170, text=f"inm [4:0]: {int(imm_low, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*20 + x1+25*25) / 2, y1 + 195, text=f"{imm_low}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*20 + x1+25*25) / 2, y1 + 220, text="(bits 11-7)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*25, y1, x1+25*32, 190, fill="#5355E8")
+        canvas.create_text((x1+25*25 + x1+25*32) / 2, y1 + 170, text=f"opcode: {int(opcode, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*25 + x1+25*32) / 2, y1 + 195, text=f"{opcode}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*25 + x1+25*32) / 2, y1 + 220, text="(bits 6-0)", font=("Times New Roman", 10))
+
+        for i in range(1, 33):
+            x1_plus = 49*i+i
+            canvas.create_text((x1 + x1_plus) / 2, y1 + 65, text=f"{new_word[i-1]}", font=("Times New Roman", 15,"bold"),fill="white")
+
+        canvas.create_text(x1 + 400, y1 + 270, text=instruction, font=("Times New Roman", 22, "italic"))
+        canvas.create_text(x1 + 400, y1 + 310, text=f"0x{word:08x}", font=("Times New Roman", 20, "italic"))
+
+        canvas_text.create_text(x1 + 400, y1, text=f"opcode: Identifica la instrucción como una operación de tipo I.", font=("Times New Roman", 12, "italic"),anchor="center")
+        canvas_text.create_text(x1 + 400, y1 + 45, text=f"inm [4:0]: Valor inmediato `{imm_low}` parte suoerior", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 90, text=f"rs2: Registro destino `x{int(rs2, 2)}` donde se guarda el resultado.", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 135, text=f"rs1: contiene la dirección base de memoria. `x{int(rs1, 2)}`", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 180, text=f"funct3: Determina el tipo de operación `{mnemonic}`.", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 225, text=f"inm [11:5]: Valor inmediato `{imm_high}` parte inferior ", font=("Times New Roman", 12, "italic"))
+
 
         print(f"S-type instruction fields:")
         print(f"imm[11:5]: {imm_high} (bits 31-25)")
@@ -366,6 +451,58 @@ def explain_instruction(instruction: str, word: int) -> str:
         funct3 = new_word[17:20]
         imm_low = new_word[20:25]
         opcode = new_word[25:32]
+
+        imm = imm_high + imm_low
+        inm_str = int(imm, 2)  # Convert binary string to integer
+        if inm_str >= 2**11:  # Si el bit de signo es 1
+            inm_str -= 2**12
+
+        #canvas.create_rectangle(30, 60, 798, 190, fill="lightblue")
+        x1, y1 = 30, 40
+        canvas.create_rectangle(x1, y1, x1+24.5*7, 190, fill="#76C3CF")
+        canvas.create_text((x1 + x1+24.5*7) / 2, y1 + 170, text=f"inm [11:5]: {int(imm_high, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1 + x1+24.5*7) / 2, y1 + 195, text=f"{imm_high}", font=("Times New Roman", 10))
+        canvas.create_text((x1 + x1+24.5*7) / 2, y1 + 220, text="(bits 31-25)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+24.5*7, y1, x1+25*12, 190, fill="#5252B7")
+        canvas.create_text((x1+24.5*7 + x1+25*12) / 2, y1 + 170, text=f"rs2: {int(rs2, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+24.5*7 + x1+25*12) / 2, y1 + 195, text=f"{rs2}", font=("Times New Roman", 10))
+        canvas.create_text((x1+24.5*7 + x1+25*12) / 2, y1 + 220, text="(bits 19-15)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+24.5*12, y1, x1+25*17, 190, fill="#587BE2")
+        canvas.create_text((x1+24.5*12 + x1+25*17) / 2, y1 + 170, text=f"rs1: {int(rs1, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+24.5*12 + x1+25*17) / 2, y1 + 195, text=f"{rs1}", font=("Times New Roman", 10))
+        canvas.create_text((x1+24.5*12 + x1+25*17) / 2, y1 + 220, text="(bits 19-15)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*17, y1, x1+25*20, 190, fill="#36A6C5")
+        canvas.create_text((x1+25*17 + x1+25*20) / 2, y1 + 170, text=f"funct3: {int(funct3, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*17 + x1+25*20) / 2, y1 + 195, text=f"{funct3}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*17 + x1+25*20) / 2, y1 + 220, text="(bits 12-14)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*20, y1, x1+25*25, 190, fill="#8AB9E3")
+        canvas.create_text((x1+25*20 + x1+25*25) / 2, y1 + 170, text=f"inm [4:0]: {int(imm_low, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*20 + x1+25*25) / 2, y1 + 195, text=f"{imm_low}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*20 + x1+25*25) / 2, y1 + 220, text="(bits 11-7)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*25, y1, x1+25*32, 190, fill="#5355E8")
+        canvas.create_text((x1+25*25 + x1+25*32) / 2, y1 + 170, text=f"opcode: {int(opcode, 2)}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*25 + x1+25*32) / 2, y1 + 195, text=f"{opcode}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*25 + x1+25*32) / 2, y1 + 220, text="(bits 6-0)", font=("Times New Roman", 10))
+
+        for i in range(1, 33):
+            x1_plus = 49*i+i
+            canvas.create_text((x1 + x1_plus) / 2, y1 + 65, text=f"{new_word[i-1]}", font=("Times New Roman", 15,"bold"),fill="white")
+
+        canvas.create_text(x1 + 400, y1 + 270, text=instruction, font=("Times New Roman", 22, "italic"))
+        canvas.create_text(x1 + 400, y1 + 310, text=f"0x{word:08x}", font=("Times New Roman", 20, "italic"))
+
+        canvas_text.create_text(x1 + 400, y1, text=f"opcode: Identifica la instrucción como una operación de tipo I.", font=("Times New Roman", 12, "italic"),anchor="center")
+        canvas_text.create_text(x1 + 400, y1 + 45, text=f"inm [4:0]: Valor inmediato `{imm_low}` parte suoerior", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 90, text=f"rs2: Registro destino `x{int(rs2, 2)}` donde se guarda el resultado.", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 135, text=f"rs1: contiene la dirección base de memoria. `x{int(rs1, 2)}`", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 180, text=f"funct3: Determina el tipo de operación `{mnemonic}`.", font=("Times New Roman", 12, "italic"))
+        canvas_text.create_text(x1 + 400, y1 + 225, text=f"inm [11:5]: Valor inmediato `{imm_high}` parte inferior ", font=("Times New Roman", 12, "italic"))
+
 
         print(f"B-type instruction fields:")
         print(f"imm[11:5]: {imm_high} (bits 31-25)")
