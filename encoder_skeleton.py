@@ -1,61 +1,67 @@
 #!/usr/bin/env python3
 """
-Esqueleto del Codificador Educativo de Instrucciones RISC-V.
+Código de desarrollo del Codificador Educativo de Instrucciones RISC-V.
 CE4301 Arquitectura de Computadores I — Proyecto Individual — 2026-II
+Estudiante : [Heizel Tatiana Chacón Mora]
 
-Este esqueleto ya implementa el contrato de línea de comandos y de salida
-requerido por la especificación. Usted debe completar las dos funciones
-marcadas con TODO; puede modificar el resto del archivo si lo necesita,
-siempre que se preserve el contrato de invocación y la línea "HEX: 0x...".
+Esta es una herramienta que traduce una única instrucción del 
+subconjunto RISC-V RV32I  a su codificacion binaria de 32 bits, 
+mostrando de forma visual el significado de cada campo del 
+formato correspondiente (R, I, S o B). 
 
-No es obligatorio usar este esqueleto ni Python: puede implementar su
-propia herramienta desde cero, en el lenguaje que prefiera, siempre que
-respete el mismo contrato (ver especificación, sección "Modo de operación").
 """
 import sys
 import tkinter as tk
 
-
 SOPORTADAS = ["add", "sub", "and", "or", "addi", "andi",
               "lw", "lb", "sw", "sb", "beq", "bne"]
+
+def get_instruction_format(instruction: str) -> str:
+    """
+    Recibe el mnemonico de la instrucción como texto, y debe
+    retornar el formato de la instrucción: "R", "I", "S" o "B".
+
+    Debe soportar únicamente las instrucciones en SOPORTADAS.
+    """
+    if instruction in ["add", "sub", "and", "or"]:
+        return "R"
+    elif instruction in ["addi", "andi", "lw", "lb"]:
+        return "I"
+    elif instruction in ["sw", "sb"]:
+        return "S"
+    elif instruction in ["beq", "bne"]:
+        return "B"
+    else:
+        raise ValueError(f"Instrucción no soportada: {instruction}")
 
 
 def encode_instruction(instruction: str) -> int:
     """
     Recibe una instrucción como texto, p. ej. "add x5, x6, x7", y debe
     retornar su codificación de 32 bits como entero (0 <= valor < 2**32).
-
-    Debe soportar únicamente las instrucciones en SOPORTADAS. Los valores
-    de opcode/funct3/funct7 de cada una NO se proveen aquí: deben
-    investigarse en el manual oficial de la ISA RISC-V (ver referencia en
-    la especificación) y documentarse en el README.
     """
-    # TODO: implementar. Sugerencia: parsear el mnemónico y los operandos,
-    # despachar según el formato (R/I/S/B), y ensamblar los campos con
-    # operaciones de bits.
-
+    #Inicializar variables
     opcode = funct3 = funct7 = rs1 = rs2 = rd = cod_32bits = " "
     out_word = 0  # Initialize out_word to 0
 
+    #Dividir la instrucción en sus componentes: mnemonico y registros
     splitInstruction = instruction.split(" ")
     mnemonic = splitInstruction[0]
     registers = [reg.strip(",") for reg in splitInstruction[1:]]
+    format_type = get_instruction_format(mnemonic)
+
+    print("--------------------------------------")
     print("the mnemonic:")
     print(mnemonic)
     print("the registers:")
     print(registers)
 
-    #Convertir los registros a binario
+    #Convertir el registro destino rd a binario
     rd = format(int(registers[0][1:]), '05b')
-    #rs1 = format(int(registers[1][1:]), '05b')
-    #rs2 = format(int(registers[2][1:]), '05b')
     print(f"rd Value: {rd}")
-    #print(f"rs1 Value: {rs1}")
-    #print(f"rs2 Value: {rs2}") 
 
     #Validar las instrucciones de Tipo R y convertir a binario en un formato de 32 bits
-    if mnemonic == "add" or mnemonic == "sub" or mnemonic == "and" or mnemonic == "or":
-        format_type = "R"
+    if format_type == "R":
         opcode = "0110011"
 
         rs1 = format(int(registers[1][1:]), '05b')
@@ -84,25 +90,32 @@ def encode_instruction(instruction: str) -> int:
         cod_32bits = f"{funct7}{rs2}{rs1}{funct3}{rd}{opcode}"
 
     #Validar las instrucciones de Tipo I y convertir a binario en un formato de 32 bits
-    elif mnemonic == "addi" or mnemonic == "andi" or mnemonic == "lw" or mnemonic == "lb":
-        format_type = "I"
+    elif format_type == "I":
         inm = 0  # Initialize immediate value
+        inm_str = " "
 
         #Seleccionar el opcode de cada instrucción
         if mnemonic == "addi" or mnemonic == "andi":
             opcode = "0010011"
             #Seleccionar el inmediate value de la instrucción
-            imm = format(int(registers[2]), '012b')  # Immediate value is 12 bits
+            inm_str = registers[2]
+            print(f"Immediate Value ------------: {inm_str}")
+            print(type(inm_str))
             rs1 = format(int(registers[1][1:]), '05b')
+
+            if inm_str.startswith('-'):
+                imm = format(int(inm_str) & 0xFFF, '012b')  # Handle negative immediate values
+            else:           
+                imm = format(int(inm_str), '012b')  # Immediate value is 12 bits
         elif mnemonic == "lw" or mnemonic == "lb":
             opcode = "0000011"
             #Seleccionar el inmediate value de la instrucción
-            inm, rs1 = registers[1].split('(')
+            inm_str, rs1 = registers[1].split('(')
             rs1 = rs1.rstrip(')')
             rs1 = format(int(rs1[1:]), '05b')  # Update rs1 based on the register in parentheses
 
-            if inm.startswith('-'):
-                imm = format(int(inm) & 0xFFF, '012b')  # Handle negative immediate values
+            if inm_str.startswith('-'):
+                imm = format(int(inm_str) & 0xFFF, '012b')  # Handle negative immediate values
             else:           
                 imm = format(int(inm), '012b')  # Immediate value is 12 bits    
         print(f"rs1 Value: {rs1}")
@@ -123,8 +136,7 @@ def encode_instruction(instruction: str) -> int:
         cod_32bits = f"{imm}{rs1}{funct3}{rd}{opcode}"
 
     #Validar las instrucciones de Tipo S y convertir a binario en un formato de 32 bits
-    elif mnemonic == "sw" or mnemonic == "sb":
-        format_type = "S"  # Load/store instructions use I
+    elif format_type == "S":
         inm = 0  # Initialize immediate value
         opcode = "0100011"
 
@@ -156,16 +168,13 @@ def encode_instruction(instruction: str) -> int:
 
         #Combinar los campos en un solo valor de 32 bits
         cod_32bits = f"{inm_high}{rd}{rs1}{funct3}{inm_low}{opcode}"
-        print(f"the cod_32bits binary (S): {cod_32bits}")
 
     #Validar las instrucciones de Tipo B y convertir a binario en un formato de 32 bits
-    elif mnemonic == "beq" or mnemonic == "bne":
-        format_type = "B"
+    elif format_type == "B":
         opcode = "1100011"
         
         rs1 = format(int(registers[0][1:]), '05b')
         print(f"rs1 Value: {rs1}")
-
         rs2 = format(int(registers[1][1:]), '05b')
         print(f"rs2 Value: {rs2}") 
 
@@ -174,20 +183,11 @@ def encode_instruction(instruction: str) -> int:
             funct3 = "000"
         elif mnemonic == "bne":
             funct3 = "001"
-        print(f"funct3 Value: {funct3}")
+        print(f"funct3 Value: {funct3}")        
 
-        # Convertir immediate a entero y obtener representación de 12 bits
+        #Seleccionar el inmediate value de la instrucción y convertir a entero y obtener representación de 12 bits
         inm = int(registers[2])
         imm = format(inm & 0xFFF, '012b')
-
-        #Seleccionar el inmediate value de la instrucción
-        #imm = format(int(registers[2]), '012b')
-        print(f"inmediate Value: {inm}") 
-
-        # Convertir immediate a entero y obtener representación de 12 bits
-        inm = int(inm)
-        imm = format(inm & 0xFFF, '012b')
-
         print(f"Immediate Value: {imm}")
 
         # Separar immediate en los campos de una instrucción S
@@ -199,10 +199,6 @@ def encode_instruction(instruction: str) -> int:
 
         #Combinar los campos en un solo valor de 32 bits
         cod_32bits = f"{inm_high}{rd}{rs1}{funct3}{inm_low}{opcode}"
-        print(f"the cod_32bits binary (S): {cod_32bits}")
-
-        #Combinar los campos en un solo valor de 32 bits
-        cod_32bits = f"{inm_high}{rs2}{rs1}{funct3}{inm_low}{opcode}"
 
     #Validar las instrucciones de Tipo R y convertir a binario en un formato de 32 bits
     else:
@@ -217,11 +213,23 @@ def encode_instruction(instruction: str) -> int:
     print(f"the cod_32bits as integer:")    
     out_word = int(cod_32bits, 2)
     print(out_word)
+    print(f"the cod_32bits as hex:")
+    print(f"0x{out_word:08x}")  
+    print("--------------------------------------")
 
     return out_word  # Return the encoded instruction as an integer
 
-    #raise NotImplementedError("encode_instruction: pendiente de implementar para la instrucción")
 
+def create_canvas():
+    """
+    Crea un lienzo de Tkinter para mostrar la representación visual de los
+    campos de la instrucción.
+    """
+    root = tk.Tk()
+    root.title("Visualización de Instrucción RISC-V")
+    canvas = tk.Canvas(root, width=800, height=200)
+    canvas.pack()
+    return root, canvas
 
 def explain_instruction(instruction: str, word: int) -> str:
     """
@@ -232,9 +240,131 @@ def explain_instruction(instruction: str, word: int) -> str:
     El formato visual (colores, tabla, arte ASCII, etc.) queda a su
     criterio, siempre que sea claro.
     """
-    # TODO: implementar.
-    #raise NotImplementedError("explain_instruction: pendiente de implementar")
+    splitInstruction = instruction.split(" ")
+    mnemonic = splitInstruction[0]
+    format_type = get_instruction_format(mnemonic)
 
+    # Crear ventana
+    ventana = tk.Tk()
+
+    # Título
+    ventana.title("Codificador RISC-V")
+    # Tamaño de la ventana
+    ventana.geometry("930x800")
+
+    # Crear el área de dibujo
+    canvas = tk.Canvas(ventana, width=850, height=380, bg="white")
+    canvas.place(x=465, y=270, anchor="center")
+
+    # Crear el área de dibujo
+    canvas_text = tk.Canvas(ventana, width=850, height=300, bg="white")
+    canvas_text.place(x=465, y=620, anchor="center")
+
+    # Texto
+    etiqueta = tk.Label(
+        ventana,
+        text="Codificador de instrucciones RISC-V",
+        font=("Times New Roman", 20)
+    )
+    etiqueta.place(x=465, y=35, anchor="center")
+    
+    new_word = format(word, '032b')  # Convert the integer to a 32-bit binary string
+    if format_type == "R":
+        rd = new_word[20:25]
+        funct3 = new_word[17:20]
+        rs1 = new_word[12:17]
+        rs2 = new_word[7:12]
+        funct7 = new_word[0:7]
+        opcode = new_word[25:33]
+
+        #canvas.create_rectangle(30, 60, 798, 190, fill="lightblue")
+        x1, y1 = 30, 40
+        canvas.create_rectangle(x1, y1, x1+24.5*7, 190, fill="#76C3CF")
+        canvas.create_text((x1 + x1+24.5*7) / 2, y1 + 160, text=f"funct7: {funct7}", font=("Times New Roman", 10))
+        canvas.create_text((x1 + x1+24.5*7) / 2, y1 + 190, text="(bits 31-25)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+24.5*7, y1, x1+25*12, 190, fill="#5252B7")
+        canvas.create_text((x1+24.5*7 + x1+25*12) / 2, y1 + 160, text=f"rs2: {rs2}", font=("Times New Roman", 10))
+        canvas.create_text((x1+24.5*7 + x1+25*12) / 2, y1 + 190, text="(bits 24-20)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*12, y1, x1+25*17, 190, fill="#587BE2")
+        canvas.create_text((x1+25*12 + x1+25*17) / 2, y1 + 160, text=f"rs1: {rs1}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*12 + x1+25*17) / 2, y1 + 190, text="(bits 19-15)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*17, y1, x1+25*20, 190, fill="#36A6C5")
+        canvas.create_text((x1+25*17 + x1+25*20) / 2, y1 + 160, text=f"funct3: {funct3}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*17 + x1+25*20) / 2, y1 + 190, text="(bits 12-14)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*20, y1, x1+25*25, 190, fill="#8AB9E3")
+        canvas.create_text((x1+25*20 + x1+25*25) / 2, y1 + 160, text=f"rd: {rd}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*20 + x1+25*25) / 2, y1 + 190, text="(bits 11-7)", font=("Times New Roman", 10))
+
+        canvas.create_rectangle(x1+25*25, y1, x1+25*32, 190, fill="#5355E8")
+        canvas.create_text((x1+25*25 + x1+25*32) / 2, y1 + 160, text=f"opcode: {opcode}", font=("Times New Roman", 10))
+        canvas.create_text((x1+25*25 + x1+25*32) / 2, y1 + 190, text="(bits 6-0)", font=("Times New Roman", 10))
+
+        for i in range(1, 33):
+            x1_plus = 49*i+i
+            canvas.create_text((x1 + x1_plus) / 2, y1 + 65, text=f"{new_word[i-1]}", font=("Times New Roman", 15,"bold"),fill="white")
+
+        canvas.create_text(x1 + 400, y1 + 250, text=instruction, font=("Times New Roman", 22, "italic"))
+        canvas.create_text(x1 + 400, y1 + 300, text=f"0x{word:08x}", font=("Times New Roman", 20, "italic"))
+        
+        print(f"R-type instruction fields:")
+        print(f"funct7: {funct7} (bits 31-25)")
+        print(f"rs2: {rs2} (bits 24-20)")
+        print(f"rs1: {rs1} (bits 19-15)")
+        print(f"funct3: {funct3} (bits 14-12)")
+        print(f"rd: {rd} (bits 11-7)")
+        print(f"opcode: {opcode} (bits 6-0)")
+    elif format_type == "I":
+        imm = new_word[0:12]
+        rs1 = new_word[12:17]
+        funct3 = new_word[17:20]
+        rd = new_word[20:25]
+        opcode = new_word[25:32]
+
+        print(f"I-type instruction fields:")
+        print(f"imm: {imm} (bits 31-20)")
+        print(f"rs1: {rs1} (bits 19-15)")
+        print(f"funct3: {funct3} (bits 14-12)")
+        print(f"rd: {rd} (bits 11-7)")
+        print(f"opcode: {opcode} (bits 6-0)")
+    elif format_type == "S":
+        imm_high = new_word[0:7]
+        rs2 = new_word[7:12]
+        rs1 = new_word[12:17]
+        funct3 = new_word[17:20]
+        imm_low = new_word[20:25]
+        opcode = new_word[25:32]
+
+        print(f"S-type instruction fields:")
+        print(f"imm[11:5]: {imm_high} (bits 31-25)")
+        print(f"rs2: {rs2} (bits 24-20)")
+        print(f"rs1: {rs1} (bits 19-15)")
+        print(f"funct3: {funct3} (bits 14-12)")
+        print(f"imm[4:0]: {imm_low} (bits 11-7)")
+        print(f"opcode: {opcode} (bits 6-0)")
+    elif format_type == "B":
+        imm_high = new_word[0:7]
+        rs2 = new_word[7:12]
+        rs1 = new_word[12:17]
+        funct3 = new_word[17:20]
+        imm_low = new_word[20:25]
+        opcode = new_word[25:32]
+
+        print(f"B-type instruction fields:")
+        print(f"imm[11:5]: {imm_high} (bits 31-25)")
+        print(f"rs2: {rs2} (bits 24-20)")
+        print(f"rs1: {rs1} (bits 19-15)")
+        print(f"funct3: {funct3} (bits 14-12)")
+        print(f"imm[4:0]: {imm_low} (bits 11-7)")
+        print(f"opcode: {opcode} (bits 6-0)")
+    else:
+        print(f"Unknown instruction format: {format_type}")
+
+    print("--------------------------------------")
+    print(f"Format type: {format_type}")
     print("the instruction:")
     print(instruction)
     print("the word integer:")  
@@ -242,23 +372,7 @@ def explain_instruction(instruction: str, word: int) -> str:
     print("the word binary:")
     word = format(word, '032b')  # Convert the integer to a 32-bit binary string
     print(word)
-
-        # Crear ventana
-    ventana = tk.Tk()
-
-    # Título
-    ventana.title("Codificador RISC-V")
-
-    # Tamaño de la ventana
-    ventana.geometry("600x400")
-
-    # Texto
-    etiqueta = tk.Label(
-        ventana,
-        text="Codificador de instrucciones RISC-V",
-        font=("Arial", 20)
-    )
-    etiqueta.pack(pady=30)
+    print("--------------------------------------")
 
     # Mantener la ventana abierta
     ventana.mainloop()
