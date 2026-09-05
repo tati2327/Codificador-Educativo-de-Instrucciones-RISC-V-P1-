@@ -69,7 +69,16 @@ Más adelante en el manual en la página número 130 se brindan unas tablas con 
 
 ![Salida de desemsamblar codigo objdump](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-09-04%20182106.png)
 
-![Archivo de instrucciones emsambladas]([https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-08-31%20084426.png](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-09-04%20182249.png))
+![Archivo de instrucciones emsambladas](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-09-04%20182249.png)
+
+Se creo un archivo en python para imprimir las funciones con sus respectivas respresentaciones de emsamblador, hexadecimal y binario
+
+![P1](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-09-03%20141933.png)
+![P2](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-09-03%20142012.png)
+![P3](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-09-03%20142026.png)
+![P4](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-09-03%20142045.png)
+![P5](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-09-03%20142114.png)
+![P6](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-09-03%20142123.png)
 
 
 # Bibliografía 
