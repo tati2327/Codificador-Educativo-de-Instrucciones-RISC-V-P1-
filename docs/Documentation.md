@@ -65,6 +65,12 @@ Más adelante en el manual en la página número 130 se brindan unas tablas con 
 
 ![RISC-V base instruction part two](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-08-31%20084426.png)
 
+### *Evidencia de la validaci´on contra el toolchain oficial.*
+
+![Salida de desemsamblar codigo objdump](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-09-04%20182106.png)
+
+![Archivo de instrucciones emsambladas]([https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-08-31%20084426.png](https://github.com/tati2327/Codificador-Educativo-de-Instrucciones-RISC-V-P1-/blob/main/images/Captura%20de%20pantalla%202026-09-04%20182249.png))
+
 
 # Bibliografía 
 
