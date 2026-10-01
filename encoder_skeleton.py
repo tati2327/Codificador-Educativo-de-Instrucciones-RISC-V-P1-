@@ -240,6 +240,7 @@ def explain_instruction(instruction: str, word: int) -> str:
         textPrint = f"""
                 ================================================
                 The instruction: {instruction}
+                mnemonic rd, rs1, rs2
                 ================================================
                 Formato R
                 ================================================
@@ -252,6 +253,7 @@ def explain_instruction(instruction: str, word: int) -> str:
                 ================================================
                 WORD: {new_word}
         
+                mnemonic rd, rs1, rs2
                 funct7: determina la operación específica.
                 rs2: registro fuente 2.
                 rs1: registro fuente 1.
@@ -274,6 +276,8 @@ def explain_instruction(instruction: str, word: int) -> str:
         textPrint = f"""
                 ================================================
                 The instruction: {instruction}
+                mnemonic rd, rs1, inm
+                mnemonic rd, inm(rs1)
                 ================================================
                 Formato I
                 ================================================
@@ -308,6 +312,7 @@ def explain_instruction(instruction: str, word: int) -> str:
         textPrint = f"""
                 ================================================
                 The instruction: {instruction}
+                mnemonic rs2, inm(rs1)
                 ================================================
                 Formato S
                 ================================================
@@ -343,6 +348,7 @@ def explain_instruction(instruction: str, word: int) -> str:
         textPrint = f"""
                 ================================================
                 The instruction: {instruction}
+                mnemonic rs2, rs1, inm
                 ================================================
                 Formato B
                 ================================================
